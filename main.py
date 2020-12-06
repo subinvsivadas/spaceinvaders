@@ -1,4 +1,5 @@
 # images from https://www.flaticon.com/
+# code from https://www.youtube.com/watch?v=FfWpgLFMI7w&t=5466s&ab_channel=freeCodeCamp.org
 # date October 24, 2020.
 # author Subin Sivadas
 import math
@@ -41,24 +42,35 @@ bullet_list = []
 
 # player image and position
 playerImage = pygame.image.load('spaceship.png')
+
 playerX = 370
 playerY = 480
 playerX_change = 0
 playerY_change = 0
 
 # alien image and position
-alienImagelist = []
-alienX = []
-alienY = []
-alienX_change = []
-alienY_change = []
-num_of_aliens = 6
-for i in range(num_of_aliens):
-    alienImagelist.append( pygame.image.load('alien.png'))
-    alienX.append(random.randint(0, 770))
-    alienY.append(random.randint(50, 150))
-    alienX_change.append(0.3)
-    alienY_change.append(30)
+class Aliens:
+    num = 0
+    alien_image = 'alien.png'
+    x = 0
+    y = 0
+    x_change = 0
+    y_change = 0
+    def __init__(self,number):
+        self.num = number
+
+number_of_aliens = 6
+alien_list =[]
+for i in range(number_of_aliens):
+    alien_list.append(Aliens(i))
+
+for alien in alien_list:
+    alien.x = random.randint(0, 770)
+    alien.y = random.randint(50, 150)
+    alien.x_change = 0.3
+    alien.y_change = 30
+    pygame.image.load(alien.alien_image)
+
 #score
 score = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
@@ -72,9 +84,8 @@ def player(x, y):
     screen.blit(playerImage, (x, y))
 
 
-def alien(x, y,i):
-    screen.blit(alienImagelist[i], (x, y))
-
+def show_alien(alien):
+    screen.blit(pygame.image.load(alien.alien_image), (alien.x, alien.y))
 
 def fire_bullet(b):
     b.state = "fire"
@@ -146,31 +157,29 @@ while running:
         playerY = 0.0
 
     # add movement to the alien ship
-    for i in range(num_of_aliens):
-        alienX[i] += alienX_change[i]
-        # check the alien is within the bounds
-        if alienX[i] < 0.0:
-            alienX_change[i] = 0.3
-            alienY[i] += alienY_change[i]
-        elif alienX[i] >= 770:
-            alienX_change[i] = -0.3
-            alienY[i] += alienY_change[i]
-
-        collision = iscollision(alienX[i], alienY[i], bullet_list)
+    for alien in alien_list:
+        alien.x += alien.x_change
+        if alien.x <0.0:
+            alien.x_change = 0.3
+            alien.y += alien.y_change
+        elif alien.x >= 770:
+            alien.x_change = -0.3
+            alien.y += alien.y_change
+        collision = iscollision(alien.x, alien.y, bullet_list)
 
         if collision:
             bullet_sound = mixer.Sound('explosion.wav')
             bullet_sound.play()
             score += 1
             print(score)
-            alienX[i] = random.randint(0, 770)
-            alienY[i] = random.randint(50, 150)
-        alien(int(alienX[i]), int(alienY[i]),i)
-    # fire bullet
+            alien.x = random.randint(0, 770)
+            alien.y = random.randint(50, 150)
+        show_alien(alien)
+    # add movement to bullets
     for b in bullet_list:
         if b.state == "fire":
             fire_bullet(b)
-            # add movement to bullet
+
             b.y -= bulletY_change
 
     # place the player and aliens on screen
