@@ -1,9 +1,10 @@
 # images from https://www.flaticon.com/
 # date October 24, 2020.
 # author Subin Sivadas
-
+import math
 import pygame
 import random
+from pygame import mixer
 
 # initialize pygame
 pygame.init()
@@ -18,6 +19,10 @@ pygame.display.set_icon(icon)
 
 # background
 background = pygame.image.load('space.png')
+
+#background sound
+mixer.music.load('background.wav')
+mixer.music.play(-1)
 
 # bullet
 bulletImage = pygame.image.load('love.png')
@@ -43,19 +48,33 @@ playerX_change = 0
 playerY_change = 0
 
 # alien image and position
-alienImage = pygame.image.load('alien.png')
-alienX = random.randint(0, 800)
-alienY = random.randint(50, 150)
-alienX_change = 0.3
-alienY_change = 30
+alienImagelist = []
+alienX = []
+alienY = []
+alienX_change = []
+alienY_change = []
+num_of_aliens = 6
+for i in range(num_of_aliens):
+    alienImagelist.append( pygame.image.load('alien.png'))
+    alienX.append(random.randint(0, 770))
+    alienY.append(random.randint(50, 150))
+    alienX_change.append(0.3)
+    alienY_change.append(30)
+#score
+score = 0
+font = pygame.font.Font('freesansbold.ttf', 32)
+textX = 10
+textY = 10
 
-
+def show_score(x,y):
+    score_display = font.render("score :"+str(score), True, (255, 255, 255))
+    screen.blit(score_display, (x, y))
 def player(x, y):
     screen.blit(playerImage, (x, y))
 
 
-def alien(x, y):
-    screen.blit(alienImage, (x, y))
+def alien(x, y,i):
+    screen.blit(alienImagelist[i], (x, y))
 
 
 def fire_bullet(b):
@@ -64,6 +83,15 @@ def fire_bullet(b):
     #global bullet_state
     #bullet_state = "fire"
    # screen.blit(bulletImage, (x, y))
+
+def iscollision(alienx, alieny, bulletlist):
+    crash = False
+    for bullet in bullet_list:
+        distance = math.sqrt((math.pow(bullet.x-alienx, 2))+(math.pow(bullet.y-alieny, 2)))
+        if distance < 25:
+            crash = True
+            break
+    return crash
 # Game Loop
 running = True
 while running:
@@ -96,6 +124,8 @@ while running:
                 b.x = playerX
                 b.y = playerY
                 fire_bullet(b)
+                bullet_sound =mixer.Sound('laser.wav')
+                bullet_sound.play()
                 bullet_list.append(b)
                 #fire_bullet(b)
         if event.type == pygame.KEYUP:
@@ -120,16 +150,26 @@ while running:
         playerY = 0.0
 
     # add movement to the alien ship
-    alienX += alienX_change
+    for i in range(num_of_aliens):
+        alienX[i] += alienX_change[i]
+        # check the alien is within the bounds
+        if alienX[i] < 0.0:
+            alienX_change[i] = 0.3
+            alienY[i] += alienY_change[i]
+        elif alienX[i] >= 770:
+            alienX_change[i] = -0.3
+            alienY[i] += alienY_change[i]
 
-    # check the alien is within the bounds
-    if alienX < 0.0:
-        alienX_change = 0.3
-        alienY += alienY_change
-    elif alienX >= 770:
-        alienX_change = -0.3
-        alienY += alienY_change
+        collision = iscollision(alienX[i], alienY[i], bullet_list)
 
+        if collision:
+            bullet_sound = mixer.Sound('explosion.wav')
+            bullet_sound.play()
+            score += 1
+            print(score)
+            alienX[i] = random.randint(0, 770)
+            alienY[i] = random.randint(50, 150)
+        alien(int(alienX[i]), int(alienY[i]),i)
     # fire bullet
     for b in bullet_list:
         if b.state == "fire":
@@ -140,9 +180,11 @@ while running:
     #    fire_bullet(bulletX, bulletY)
     #    bulletY -= bulletY_change
 
+
     # place the player and aliens on screen
     player(int(playerX), int(playerY))
-    alien(int(alienX), int(alienY))
+
+    show_score(textX,textY)
 
     # update the screen at the 
     # end of the main game loop
