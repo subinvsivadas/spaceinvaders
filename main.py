@@ -18,7 +18,7 @@ icon = pygame.image.load('spaceship.png')
 pygame.display.set_icon(icon)
 
 # background
-background = pygame.image.load('space.png')
+background = pygame.image.load('background_space.png')
 
 #background sound
 mixer.music.load('background.wav')
