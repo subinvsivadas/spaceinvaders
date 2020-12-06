@@ -37,7 +37,6 @@ class Bullet:
     y = 200
     state = "ready"
 
-
 bullet_list = []
 
 # player image and position
@@ -80,9 +79,6 @@ def alien(x, y,i):
 def fire_bullet(b):
     b.state = "fire"
     screen.blit(bulletImage, (b.x, b.y))
-    #global bullet_state
-    #bullet_state = "fire"
-   # screen.blit(bulletImage, (x, y))
 
 def iscollision(alienx, alieny, bulletlist):
     crash = False
@@ -127,7 +123,7 @@ while running:
                 bullet_sound =mixer.Sound('laser.wav')
                 bullet_sound.play()
                 bullet_list.append(b)
-                #fire_bullet(b)
+
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 playerX_change = 0
@@ -176,10 +172,6 @@ while running:
             fire_bullet(b)
             # add movement to bullet
             b.y -= bulletY_change
-    #if bullet_state == "fire":
-    #    fire_bullet(bulletX, bulletY)
-    #    bulletY -= bulletY_change
-
 
     # place the player and aliens on screen
     player(int(playerX), int(playerY))
