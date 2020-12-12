@@ -57,13 +57,18 @@ for i in range(num_of_aliens):
     alienImagelist.append( pygame.image.load('alien.png'))
     alienX.append(random.randint(0, 770))
     alienY.append(random.randint(50, 150))
-    alienX_change.append(0.3)
+    alienX_change.append(1)
     alienY_change.append(30)
 #score
 score = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
 textX = 10
 textY = 10
+game_over_font = pygame.font.Font('freesansbold.ttf', 64)
+
+def game_over_text():
+    game_over_display = game_over_font.render("GAME OVER", True, (255, 255, 255))
+    screen.blit(game_over_display, (200, 250))
 
 def show_score(x,y):
     score_display = font.render("score :"+str(score), True, (255, 255, 255))
@@ -147,13 +152,18 @@ while running:
 
     # add movement to the alien ship
     for i in range(num_of_aliens):
+        if alienY[i] > 200:
+            for j in range(num_of_aliens):
+                alienY[j] =2000
+            game_over_text()
+            break
         alienX[i] += alienX_change[i]
         # check the alien is within the bounds
         if alienX[i] < 0.0:
-            alienX_change[i] = 0.3
+            alienX_change[i] = 1
             alienY[i] += alienY_change[i]
         elif alienX[i] >= 770:
-            alienX_change[i] = -0.3
+            alienX_change[i] = -1
             alienY[i] += alienY_change[i]
 
         collision = iscollision(alienX[i], alienY[i], bullet_list)
