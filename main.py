@@ -1,5 +1,4 @@
 # images from https://www.flaticon.com/
-# code from https://www.youtube.com/watch?v=FfWpgLFMI7w&t=5466s&ab_channel=freeCodeCamp.org
 # date October 24, 2020.
 # author Subin Sivadas
 import math
@@ -21,7 +20,7 @@ pygame.display.set_icon(icon)
 # background
 background = pygame.image.load('background_space.png')
 
-#background sound
+# background sound
 mixer.music.load('background.wav')
 mixer.music.play(-1)
 
@@ -38,15 +37,16 @@ class Bullet:
     y = 200
     state = "ready"
 
+
 bullet_list = []
 
 # player image and position
 playerImage = pygame.image.load('spaceship.png')
-
 playerX = 370
 playerY = 480
 playerX_change = 0
 playerY_change = 0
+
 
 # alien image and position
 class Aliens:
@@ -56,11 +56,13 @@ class Aliens:
     y = 0
     x_change = 0
     y_change = 0
-    def __init__(self,number):
+
+    def __init__(self, number):
         self.num = number
 
+
 number_of_aliens = 6
-alien_list =[]
+alien_list = []
 for i in range(number_of_aliens):
     alien_list.append(Aliens(i))
 
@@ -71,15 +73,24 @@ for alien in alien_list:
     alien.y_change = 30
     pygame.image.load(alien.alien_image)
 
-#score
+# score
 score = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
 textX = 10
 textY = 10
+game_over_font = pygame.font.Font('freesansbold.ttf', 64)
 
-def show_score(x,y):
-    score_display = font.render("score :"+str(score), True, (255, 255, 255))
+
+def game_over_text():
+    game_over_display = game_over_font.render("GAME OVER", True, (255, 255, 255))
+    screen.blit(game_over_display, (200, 250))
+
+
+def show_score(x, y):
+    score_display = font.render("score :" + str(score), True, (255, 255, 255))
     screen.blit(score_display, (x, y))
+
+
 def player(x, y):
     screen.blit(playerImage, (x, y))
 
@@ -87,18 +98,22 @@ def player(x, y):
 def show_alien(alien):
     screen.blit(pygame.image.load(alien.alien_image), (alien.x, alien.y))
 
+
 def fire_bullet(b):
     b.state = "fire"
     screen.blit(bulletImage, (b.x, b.y))
 
+
 def iscollision(alienx, alieny, bulletlist):
     crash = False
     for bullet in bullet_list:
-        distance = math.sqrt((math.pow(bullet.x-alienx, 2))+(math.pow(bullet.y-alieny, 2)))
+        distance = math.sqrt((math.pow(bullet.x - alienx, 2)) + (math.pow(bullet.y - alieny, 2)))
         if distance < 25:
             crash = True
             break
     return crash
+
+
 # Game Loop
 running = True
 while running:
@@ -111,8 +126,8 @@ while running:
         # event for pressing close window
         if event.type == pygame.QUIT:
             running = False
-    # if keystroke is pressed check if
-    # its left or right
+        # if keystroke is pressed check if
+        # its left or right
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 # move left
@@ -131,7 +146,7 @@ while running:
                 b.x = playerX
                 b.y = playerY
                 fire_bullet(b)
-                bullet_sound =mixer.Sound('laser.wav')
+                bullet_sound = mixer.Sound('laser.wav')
                 bullet_sound.play()
                 bullet_list.append(b)
 
@@ -158,8 +173,13 @@ while running:
 
     # add movement to the alien ship
     for alien in alien_list:
+        if alien.y > 200:
+            for aliens in alien_list:
+                aliens.y = 2000
+            game_over_text()
+            break
         alien.x += alien.x_change
-        if alien.x <0.0:
+        if alien.x < 0.0:
             alien.x_change = 0.3
             alien.y += alien.y_change
         elif alien.x >= 770:
@@ -178,12 +198,13 @@ while running:
     for b in bullet_list:
         if b.state == "fire":
             fire_bullet(b)
+            # add movement to bullet
             b.y -= bulletY_change
 
     # place the player and aliens on screen
     player(int(playerX), int(playerY))
 
-    show_score(textX,textY)
+    show_score(textX, textY)
 
     # update the screen at the 
     # end of the main game loop
