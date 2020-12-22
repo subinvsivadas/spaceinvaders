@@ -171,7 +171,6 @@ while running:
             bullet_sound = mixer.Sound('explosion.wav')
             bullet_sound.play()
             score += 1
-            print(score)
             alien.x = random.randint(0, 770)
             alien.y = random.randint(50, 150)
         show_alien(alien)
@@ -179,7 +178,6 @@ while running:
     for b in bullet_list:
         if b.state == "fire":
             fire_bullet(b)
-
             b.y -= bulletY_change
 
     # place the player and aliens on screen
